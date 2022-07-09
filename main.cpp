@@ -8,7 +8,7 @@
 #include "detection/skyline_localization.hpp"
 
 namespace{
-    std::string temp_img_paths = "/Users/naoya/code/skyline_matching/pics/test.png";
+    std::string temp_img_path = "/Users/naoya/code/skyline_matching/pics/albelt2_1.png";
     std::string tar_img_dir = "/Users/naoya/code/skyline_matching/pics/";
 
     std::vector<std::string> get_file_path(std::string input_dir) {
@@ -21,16 +21,21 @@ namespace{
         globfree(&globbuf);
         return files;
     }
+    double img_width = 800.0;
+    double img_height = 600.0;
 }
 
 int main(){
     std::vector<std::string> tar_img_paths = get_file_path(tar_img_dir);
-    SkylineLocalization *skyline = new SkylineLocalization();
-    cv::Mat temp_img = cv::imread(temp_img_paths);
+    SkylineLocalization *skyline = new SkylineLocalization("albelt1");
+    cv::Mat temp_img = cv::imread(temp_img_path);
+    cv::resize(temp_img, temp_img, cv::Size(), img_width/temp_img.cols ,img_height/temp_img.rows);
     skyline->snapStartPos(temp_img, "front", true);
-    for(int i = 0; i < tar_img_paths.size(); i++){
+    for(int i = 0; i < 2; i++){
+        std::cout << tar_img_paths[i] << std::endl;
         cv::Mat tar_img = cv::imread(tar_img_paths[i]);
-        double angle = skyline->calucurateAngle(tar_img, "front", true);
+        cv::resize(tar_img, tar_img, cv::Size(), img_width/tar_img.cols ,img_height/tar_img.rows);
+        double angle = skyline->calucurateAngle(std::to_string(i), tar_img, "front", true);
         std::cout << "target : " << tar_img_paths[i] << " angle : " << angle << " °" << std::endl;
     }
     return 0;
